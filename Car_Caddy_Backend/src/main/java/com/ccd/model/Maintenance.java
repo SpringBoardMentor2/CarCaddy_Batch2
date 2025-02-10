@@ -2,6 +2,8 @@ package com.ccd.model;
 
 import java.time.LocalDate;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -101,9 +103,22 @@ public class Maintenance {
 	public Car getCar() {
 		return car;
 	}
-
+   
 	public void setCar(Car car) {
 		this.car = car;
 	}
+	 @JsonProperty("carId")
+	    public Long getCarId() {
+	        return car != null ? car.getCarId() : null;
+	    }
+	 private String message; 
+
+	    public String getMessage() {
+	        return message;
+	    }
+
+	    public void setMessage(String message) {
+	        this.message = message;
+	    }
 
 }

@@ -87,6 +87,33 @@ public class EmailService {
 		}
 
 		sendEmail("nivethas.21msc@kongu.edu", subject, body.toString());
+		
+		
 	}
+	
+	
+	//Maintenance 
+	public void sendMaintenanceAddEmail(String to, String subject, String body) 
+	{
+	    sendEmail(to, subject, body);
+	}
+	
+	public void sendMaintenanceUpdateEmail(String to, String subject, String body) {
+	    sendEmail(to, subject, body);
+	}
+	public void sendMaintenanceCompletionEmail(String to, String subject, String body) {
+
+	    sendEmail(to, subject, body);
+	}
+	 public void sendDailyReportEmail( String subject, String body) {
+	        SimpleMailMessage message = new SimpleMailMessage();
+	        message.setTo("springboardmentor430@gmail.com");
+	        message.setSubject(subject);
+	        message.setText(body);
+	        mailSender.send(message);
+	        System.out.println("Daily report email sent");
+	    }
+    
+
 
 }

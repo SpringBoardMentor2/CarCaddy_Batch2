@@ -43,7 +43,7 @@ public class Admin {
 
 	@NotNull
 	@NotEmpty(message = "Provide value for Username")
-	@Size(max = 10, message = "username must not exceed 10 characters")
+	@Size(max = 20, message = "username must not exceed 20 characters")
 	private String username;
 
 	@NotNull

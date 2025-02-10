@@ -28,5 +28,8 @@ public interface IMaintenanceService {
 	List<Maintenance> getMaintenanceByCarId(Long carId);
 
 	void deleteMaintenanceById(Long maintenanceId) throws InvalidEntityException;
+	List<Object[]> getCarMaintenanceDetails();
+
+	void notifyMaintenanceCompletion(Long maintenanceId) throws InvalidEntityException;
 
 }

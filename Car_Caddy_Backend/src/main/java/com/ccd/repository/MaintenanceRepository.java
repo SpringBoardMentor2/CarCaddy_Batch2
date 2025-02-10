@@ -29,5 +29,11 @@ public interface MaintenanceRepository extends JpaRepository<Maintenance, Long> 
 	List<Maintenance> findAll();
 
 	List<Maintenance> findByCar_CarId(Long carId);
+	
+	@Query("SELECT c.carId, c.vehicleType, c.model, c.fuelType, c.mileage, c.licencePlateNumber, c.lastMaintenanceDate, c.nextMaintenanceDate, COUNT(m.maintenanceId) " +
+	           "FROM Car c LEFT JOIN c.maintenance m " +
+	           "GROUP BY c.carId, c.vehicleType, c.model, c.fuelType, c.mileage, c.licencePlateNumber, c.lastMaintenanceDate, c.nextMaintenanceDate")
+	    List<Object[]> getCarMaintenanceDetails();
+	
 
 }

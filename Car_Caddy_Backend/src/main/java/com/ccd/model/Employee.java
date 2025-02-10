@@ -10,9 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -54,13 +52,11 @@ public class Employee {
 	@NotEmpty(message = "Provide value for status")
 	private String status; // active or inactive
 
+	private String availabilityStatus = "available";
+
 	@OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonIgnore
 	private List<Rent_Booking> bookings;
-
-//	@OneToOne(cascade = CascadeType.ALL)
-//	@JoinColumn(name = "car_id")
-//	private Car assignedCar;
 
 	public long getEmployeeId() {
 		return employeeId;
@@ -134,6 +130,14 @@ public class Employee {
 		this.status = status;
 	}
 
+	public String getAvailabilityStatus() {
+		return availabilityStatus;
+	}
+
+	public void setAvailabilityStatus(String availabilityStatus) {
+		this.availabilityStatus = availabilityStatus;
+	}
+
 	public List<Rent_Booking> getBookings() {
 		return bookings;
 	}
@@ -141,14 +145,6 @@ public class Employee {
 	public void setBookings(List<Rent_Booking> bookings) {
 		this.bookings = bookings;
 	}
-
-//	public Car getAssignedCar() {
-//		return assignedCar;
-//	}
-//
-//	public void setAssignedCar(Car assignedCar) {
-//		this.assignedCar = assignedCar;
-//	}
 
 	public Employee(int employeeId, String employeeName, LocalDate dateOfBirth, String employeeEmail,
 			String accountType, String defaultPassword, String designation, LocalDate accountExpiryDate, String status,
@@ -164,12 +160,10 @@ public class Employee {
 		this.accountExpiryDate = accountExpiryDate;
 		this.status = status;
 		this.bookings = bookings;
-//		this.assignedCar = assignedCar;
 	}
 
 	public Employee() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 }

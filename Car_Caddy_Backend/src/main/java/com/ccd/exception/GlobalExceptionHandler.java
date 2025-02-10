@@ -11,113 +11,98 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.ccd.exception.GlobalExceptionHandler;
-import com.ccd.exception.AdminAlreadyExistException;
-import com.ccd.exception.AdminNotFoundException;
-import com.ccd.exception.EmployeeNotFoundException;
-import com.ccd.exception.PasswordNotFoundException;
-
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-//	 private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
 
-	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-		Map<String, String> errors = new HashMap<>();
+        List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
+        for (FieldError e : fieldErrors) {
+            errors.put(e.getField(), e.getDefaultMessage());
+        }
 
-		List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
 
-		for (FieldError e : fieldErrors) {
-			errors.put(e.getField(), e.getDefaultMessage());
-		}
-		return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-	}
+    @ExceptionHandler(InvalidEntityException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidEntityException(InvalidEntityException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("message", ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
 
-	@ExceptionHandler(InvalidEntityException.class)
-	public ResponseEntity<Map<String, String>> handleEmployeeNotFoundException(InvalidEntityException ex) {
-		Map<String, String> error = new HashMap<>();
-		error.put("message", ex.getMessage());
-		return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
-	}
+    @ExceptionHandler(NoDataFoundException.class)
+    public ResponseEntity<Map<String, String>> handleNoDataFoundException(NoDataFoundException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("message", ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
 
-	@ExceptionHandler(NoDataFoundException.class)
-	public ResponseEntity<Map<String, String>> handleNoDataFoundException(NoDataFoundException ex) {
-		Map<String, String> error = new HashMap<>();
-		error.put("message", ex.getMessage());
-		return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
-	}
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleEntityNotFoundException(EntityNotFoundException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("message", ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
 
-	@ExceptionHandler(EntityNotFoundException.class)
-	public ResponseEntity<Map<String, String>> handleEntityNotFoundException(EntityNotFoundException ex) {
-		Map<String, String> error = new HashMap<>();
-		error.put("message", ex.getMessage());
-		return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
-	}
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Map<String, String>> handleConstraintViolationException(ConstraintViolationException ex) {
+        Map<String, String> errors = new HashMap<>();
+        for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
+            String fieldName = violation.getPropertyPath().toString();
+            String errorMessage = violation.getMessage();
+            errors.put(fieldName, errorMessage);
+        }
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
 
-	@ExceptionHandler(ConstraintViolationException.class)
-	public ResponseEntity<Map<String, String>> handleConstraintViolationException(ConstraintViolationException ex) {
-		Map<String, String> errors = new HashMap<>();
-		for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
-			String fieldName = violation.getPropertyPath().toString(); // Field causing the error
-			String errorMessage = violation.getMessage(); // Validation error message
-			errors.put(fieldName, errorMessage);
-		}
-		return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-	}
+    @ExceptionHandler(EmployeeNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleEmployeeNotFoundException(EmployeeNotFoundException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
 
-	@ExceptionHandler(EmployeeNotFoundException.class)
-	public ResponseEntity<Map<String, String>> handleEmployeeNotFoundException(EmployeeNotFoundException ex) {
-		Map<String, String> errorResponse = new HashMap<>();
-		errorResponse.put("error", ex.getMessage()); // Assume the error is related to the 'email' field
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-	}
+    @ExceptionHandler(AdminNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleAdminNotFoundException(AdminNotFoundException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
 
-//    @ExceptionHandler(AdminNotFoundException.class)
-//    public ResponseEntity<String> handleAdminNotFoundException(AdminNotFoundException ex) {
-//        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-//    }
+    @ExceptionHandler(AdminAlreadyExistException.class)
+    public ResponseEntity<Map<String, String>> handleAdminAlreadyExistsException(AdminAlreadyExistException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse); // Use CONFLICT for duplicate entities
+    }
 
-	@ExceptionHandler(AdminNotFoundException.class)
-	public ResponseEntity<Map<String, String>> handleAdminNotFoundException(AdminNotFoundException ex) {
-		Map<String, String> errorResponse = new HashMap<>();
-		errorResponse.put("error", ex.getMessage()); // Assume the error is related to the 'email' field
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-	}
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
 
-	@ExceptionHandler(AdminAlreadyExistException.class)
-	public ResponseEntity<Map<String, String>> handleAdminAlreadyExistsException(AdminAlreadyExistException ex) {
-		Map<String, String> errorResponse = new HashMap<>();
-		errorResponse.put("error", ex.getMessage()); // Assume the error is related to the 'email' field
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-	}
+    @ExceptionHandler(PasswordNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handlePasswordNotFoundException(PasswordNotFoundException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
 
-	@ExceptionHandler(IllegalArgumentException.class)
-	public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException ex) {
-		Map<String, String> errorResponse = new HashMap<>();
-		errorResponse.put("error", ex.getMessage());
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-	}
-
-	@ExceptionHandler(PasswordNotFoundException.class)
-	public ResponseEntity<Map<String, String>> handlePasswordNotFoundException(PasswordNotFoundException ex) {
-		Map<String, String> errorResponse = new HashMap<>();
-		errorResponse.put("error", ex.getMessage());
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-	}
-
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<Map<String, String>> handleGeneralException1(Exception ex) {
-		Map<String, String> errorResponse = new HashMap<>();
-		errorResponse.put("error", ex.getMessage());
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-	}
-
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleGeneralException(Exception ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", "An unexpected error occurred");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+}
 //	// General exception handler
 //	@ExceptionHandler(Exception.class)
 //    public ResponseEntity<Map<String, String>> handleGeneralException(Exception ex) {
@@ -170,4 +155,4 @@ public class GlobalExceptionHandler {
 //      return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
 //  }
 
-}
+

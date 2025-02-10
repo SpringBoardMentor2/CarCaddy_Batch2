@@ -75,15 +75,24 @@ public class MaintenanceController {
         return maintenanceService.getMaintenanceByCarId(carId);
     }
     
+    @GetMapping("/carDetails")
+    public List<Object[]> getCarMaintenanceDetails() {
+        return maintenanceService.getCarMaintenanceDetails();
+    }
+  
 
-//    @DeleteMapping("/delete/{maintenanceId}")
-//    public ResponseEntity<String> deleteMaintenanceById(@PathVariable Long maintenanceId) {
-//        try {
-//            maintenanceService.deleteMaintenanceById(maintenanceId);
-//            return ResponseEntity.ok("Maintenance record deleted successfully.");
-//        } catch (InvalidEntityException e) {
-//        	return ResponseEntity.badRequest().body(e.getMessage());
-//        }
-//    }
+    @DeleteMapping("/delete/{maintenanceId}")
+    public ResponseEntity<String> deleteMaintenanceById(@PathVariable Long maintenanceId) {
+        try {
+            maintenanceService.deleteMaintenanceById(maintenanceId);
+            return ResponseEntity.ok("Maintenance record deleted successfully.");
+        } catch (InvalidEntityException e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Unexpected error: " + e.getMessage());
+        }
+    }
 
 }
+
+
